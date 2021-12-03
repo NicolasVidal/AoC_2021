@@ -34,11 +34,13 @@ mod j1_tests {
 
     #[test]
     fn test_p1() {
-        assert_eq!(7, _p1(include_str!("j1_test.txt")))
+        assert_eq!(7, _p1(include_str!("j1_test.txt")));
+        assert_eq!(1602, _p1(include_str!("j1.txt")));
     }
 
     #[test]
     fn test_p2() {
-        assert_eq!(5, _p2(include_str!("j1_test.txt")))
+        assert_eq!(5, _p2(include_str!("j1_test.txt")));
+        assert_eq!(1633, _p2(include_str!("j1.txt")));
     }
 }

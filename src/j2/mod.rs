@@ -41,16 +41,18 @@ pub fn p2() -> usize {
 }
 
 #[cfg(test)]
-mod j1_tests {
+mod j2_tests {
     use super::*;
 
     #[test]
     fn test_p1() {
-        assert_eq!(150, _p1(include_str!("j2_test.txt")))
+        assert_eq!(150, _p1(include_str!("j2_test.txt")));
+        assert_eq!(1480518, _p1(include_str!("j2.txt")));
     }
 
     #[test]
     fn test_p2() {
-        assert_eq!(900, _p2(include_str!("j2_test.txt")))
+        assert_eq!(900, _p2(include_str!("j2_test.txt")));
+        assert_eq!(1282809906, _p2(include_str!("j2.txt")));
     }
 }
