@@ -5,6 +5,7 @@ mod j4;
 mod j5;
 mod j6;
 mod j7;
+mod j8;
 
 fn main() {
     dbg!(j1::p1());
@@ -21,4 +22,6 @@ fn main() {
     dbg!(j6::p2());
     dbg!(j7::p1());
     dbg!(j7::p2());
+    dbg!(j8::p1());
+    dbg!(j8::p2());
 }

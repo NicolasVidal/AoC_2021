@@ -1,5 +1,3 @@
-mod naive_solution;
-
 use std::str::FromStr;
 
 fn compute_optimal_crab_move(s: &str, distance: fn(i32, i32) ->i32) -> usize {
