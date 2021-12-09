@@ -48,22 +48,23 @@ pub fn p1() -> usize {
 pub fn _p2(s: &str) -> usize {
     let (matrix, height, width) = compute_matrix_height_width(s);
 
-    let mut basin_sizes = HashMap::new();
-    let mut low_point_basins = HashMap::new();
+    let mut basin_sizes = HashMap::with_capacity(height * width / 2);
+    let mut low_point_basins = HashMap::with_capacity(height * width);
 
+    let mut path = Vec::with_capacity(height * width);
     for i in 0..height {
         for j in 0..width {
             if low_point_basins.contains_key(&(i, j)) {
                 continue;
             }
 
-            let mut path = Vec::new();
+            path.clear();
 
             let (mut row, mut col) = (i, j);
 
             loop {
                 if let Some(&(row, col)) = low_point_basins.get(&(row, col)) {
-                    for p in path {
+                    for &p in path.iter() {
                         low_point_basins.insert(p, (row, col));
                     }
                     break;
@@ -92,7 +93,7 @@ pub fn _p2(s: &str) -> usize {
                 }
 
                 if (row, col) == lowest {
-                    for p in path {
+                    for &p in path.iter() {
                         low_point_basins.insert(p, (row, col));
                     }
                     break;
