@@ -54,7 +54,7 @@ pub fn _p2(s: &str) -> usize {
     let mut low_point_basins = HashMap::new();
 
     for i in 0..height {
-        for j in 0..width {
+        'inner: for j in 0..width {
             if low_point_basins.contains_key(&(i, j)) {
                 continue;
             }
@@ -64,6 +64,13 @@ pub fn _p2(s: &str) -> usize {
             let (mut row, mut col) = (i, j);
 
             while !lower_points.contains(&(row, col)) {
+                if let Some(&(row, col)) = low_point_basins.get(&(row, col)) {
+                    for p in path {
+                        low_point_basins.insert(p, (row, col));
+                    }
+                    continue 'inner;
+                }
+
                 if matrix[row][col] < 9 {
                     path.push((row, col))
                 }
