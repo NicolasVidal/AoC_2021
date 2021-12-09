@@ -110,7 +110,8 @@ pub fn _p2(s: &str) -> usize {
 
     basin_sizes.into_iter()
         .map(|(_, v)| v)
-        .sorted_by_key(|v| usize::MAX - v)
+        .sorted()
+        .rev()
         .take(3)
         .product()
 }
