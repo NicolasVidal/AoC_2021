@@ -29,7 +29,7 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
     all_to_visit.push((SmallVec::<[&&str;24]>::new(), false));
     all_to_visit[0].0.push(nodes.iter().filter(|&&s|s == "start").next().unwrap());
 
-    let mut all_paths = Vec::new();
+    let mut path_count = 0usize;
     while let Some((mut to_visit, mut b)) = all_to_visit.pop() {
         // dbg!("Next !");
         while let Some(&n) = to_visit.last() {
@@ -38,7 +38,7 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
             // dbg!(&to_visit);
             match *n {
                 "end" => {
-                    all_paths.push(to_visit);
+                    path_count+=1;
                     break;
                 }
                 _ => {
@@ -94,7 +94,7 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
         }
     }
 
-    all_paths.len()
+    path_count
 }
 
 pub fn _p1(s: &str) -> usize {
