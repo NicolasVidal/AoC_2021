@@ -29,14 +29,19 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
     all_to_visit[0].0.push(nodes.iter().filter(|&&s|s == "start").next().unwrap());
 
     let mut all_paths = Vec::new();
-    while let Some((to_visit, b)) = all_to_visit.pop() {
+    while let Some((mut to_visit, mut b)) = all_to_visit.pop() {
+        // dbg!("Next !");
         while let Some(&n) = to_visit.last() {
+            let mut path_invalidated = false;
+            let mut local_b = b;
+            // dbg!(&to_visit);
             match *n {
                 "end" => {
                     all_paths.push(to_visit);
                     break;
                 }
                 _ => {
+                    let mut consumed = false;
                     for n in neighbours.get(n).unwrap().iter() {
                         if *n == "start" {
                             continue;
@@ -45,22 +50,45 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
                                size.get(n).unwrap(),
                                b) {
                             (_, Size::Large, _) | (0, _, _) => {
-                                let mut clone = to_visit.clone();
-                                clone.push(n);
-                                all_to_visit.push((clone, b));
+                                if consumed {
+                                    let mut clone = to_visit.clone();
+                                    clone.pop();
+                                    clone.push(n);
+                                    all_to_visit.push((clone, b));
+                                } else {
+                                    to_visit.push(n);
+                                    consumed = true;
+                                }
                             },
                             (1, Size::Small, false) if allow_one_small_cave_to_be_explored_twice => {
-                                let mut clone = to_visit.clone();
-                                clone.push(n);
-                                all_to_visit.push((clone, true));
+                                if consumed {
+                                    let mut clone = to_visit.clone();
+                                    clone.pop();
+                                    clone.push(n);
+                                    all_to_visit.push((clone, true));
+                                } else {
+                                    to_visit.push(n);
+                                    consumed = true;
+                                    local_b = true;
+                                }
                             },
                             (_, _, _) => {
-                                continue
+                                if consumed {
+                                    continue
+                                }
+                                else {
+                                    consumed = true;
+                                    to_visit.push(n);
+                                    path_invalidated = true;
+                                }
                             }
                         }
                     }
-                    break;
                 }
+            }
+            b = local_b;
+            if path_invalidated {
+                break;
             }
         }
     }
