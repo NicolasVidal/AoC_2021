@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use smallvec::SmallVec;
 
 fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> usize {
     #[derive(PartialEq)]
@@ -24,8 +25,8 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
         size.insert(node_2, if node_2.to_lowercase() == node_2 { Size::Small } else { Size::Large });
     }
 
-    let mut all_to_visit = Vec::new();
-    all_to_visit.push((Vec::new(), false));
+    let mut all_to_visit = SmallVec::<[(SmallVec<[&&str;24]>, bool);2048]>::new();
+    all_to_visit.push((SmallVec::<[&&str;24]>::new(), false));
     all_to_visit[0].0.push(nodes.iter().filter(|&&s|s == "start").next().unwrap());
 
     let mut all_paths = Vec::new();
