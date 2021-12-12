@@ -1,85 +1,97 @@
 use std::collections::{HashMap, HashSet};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use smallvec::SmallVec;
 
 fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> usize {
-    #[derive(PartialEq)]
-    enum Size {
-        Small,
-        Large,
+    #[derive(PartialEq, Eq, Hash, Clone)]
+    enum Node {
+        Start,
+        End,
+        Small(u64),
+        Large(u64),
     }
 
-    let mut nodes = HashSet::new();
+    fn name_to_node(name: &str) -> Node {
+        match name {
+            "start" => Node::Start,
+            "end" => Node::End,
+            _ => {
+                let mut hasher = DefaultHasher::new();
+                name.hash(&mut hasher);
+                let h = hasher.finish();
+                if name.to_lowercase() == name {
+                    Node::Small(h)
+                } else {
+                    Node::Large(h)
+                }
+            }
+        }
+    }
+
     let mut neighbours = HashMap::new();
-    let mut size = HashMap::new();
 
     for line in s.lines() {
         let mut line_it = line.split('-');
-        let node_1 = line_it.next().unwrap();
-        let node_2 = line_it.next().unwrap();
+        let node_1 = name_to_node(line_it.next().unwrap());
+        let node_2 = name_to_node(line_it.next().unwrap());
 
-        nodes.insert(node_1);
-        nodes.insert(node_2);
-        neighbours.entry(node_1).or_insert(HashSet::new()).insert(node_2);
-        neighbours.entry(node_2).or_insert(HashSet::new()).insert(node_1);
-        size.insert(node_1, if node_1.to_lowercase() == node_1 { Size::Small } else { Size::Large });
-        size.insert(node_2, if node_2.to_lowercase() == node_2 { Size::Small } else { Size::Large });
+        neighbours.entry(node_1.clone()).or_insert(HashSet::new()).insert(node_2.clone());
+        neighbours.entry(node_2.clone()).or_insert(HashSet::new()).insert(node_1.clone());
     }
 
-    let mut all_to_visit = SmallVec::<[(SmallVec<[&&str;24]>, bool);2048]>::new();
-    all_to_visit.push((SmallVec::<[&&str;24]>::new(), false));
-    all_to_visit[0].0.push(nodes.iter().filter(|&&s|s == "start").next().unwrap());
+    let mut all_to_visit = SmallVec::<[(SmallVec<[Node; 24]>, bool); 1024]>::new();
+    all_to_visit.push((SmallVec::<[Node; 24]>::new(), false));
+    all_to_visit[0].0.push(Node::Start);
 
     let mut path_count = 0usize;
     while let Some((mut to_visit, mut b)) = all_to_visit.pop() {
-        // dbg!("Next !");
-        while let Some(&n) = to_visit.last() {
+        while let Some(n) = to_visit.last() {
             let mut path_invalidated = false;
             let mut local_b = b;
-            // dbg!(&to_visit);
             match *n {
-                "end" => {
-                    path_count+=1;
+                Node::End => {
+                    path_count += 1;
                     break;
                 }
                 _ => {
                     let mut consumed = false;
-                    for n in neighbours.get(n).unwrap().iter() {
-                        if *n == "start" {
+                    for n in neighbours.get(&n).unwrap().iter() {
+                        if *n == Node::Start {
                             continue;
                         }
-                        match (to_visit.iter().filter(|&&c|c == n).count(),
-                               size.get(n).unwrap(),
+                        match (to_visit.iter().filter(|&c| *c == *n).count(),
+                               n,
                                b) {
-                            (_, Size::Large, _) | (0, _, _) => {
+                            (_, Node::Large(_), _) | (0, _, _) => {
                                 if consumed {
                                     let mut clone = to_visit.clone();
                                     clone.pop();
-                                    clone.push(n);
+                                    clone.push(n.clone());
                                     all_to_visit.push((clone, b));
                                 } else {
-                                    to_visit.push(n);
+                                    to_visit.push(n.clone());
                                     consumed = true;
                                 }
-                            },
-                            (1, Size::Small, false) if allow_one_small_cave_to_be_explored_twice => {
+                            }
+                            (1, Node::Small(_), false) if allow_one_small_cave_to_be_explored_twice => {
                                 if consumed {
                                     let mut clone = to_visit.clone();
                                     clone.pop();
-                                    clone.push(n);
+                                    clone.push(n.clone());
                                     all_to_visit.push((clone, true));
                                 } else {
-                                    to_visit.push(n);
+                                    to_visit.push(n.clone());
                                     consumed = true;
                                     local_b = true;
                                 }
-                            },
+                            }
                             (_, _, _) => {
                                 if consumed {
-                                    continue
-                                }
-                                else {
+                                    continue;
+                                } else {
                                     consumed = true;
-                                    to_visit.push(n);
+                                    to_visit.push(n.clone());
                                     path_invalidated = true;
                                 }
                             }
