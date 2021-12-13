@@ -10,6 +10,7 @@ mod j9;
 mod j10;
 mod j11;
 mod j12;
+mod j13;
 
 fn main() {
     dbg!(j1::p1());
@@ -36,4 +37,6 @@ fn main() {
     dbg!(j11::p2());
     dbg!(j12::p1());
     dbg!(j12::p2());
+    dbg!(j13::p1());
+    dbg!(j13::p2());
 }

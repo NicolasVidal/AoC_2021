@@ -40,8 +40,8 @@ fn compute_paths(s: &str, allow_one_small_cave_to_be_explored_twice: bool) -> us
         neighbours.entry(node_2.clone()).or_insert(HashSet::new()).insert(node_1.clone());
     }
 
-    let mut all_to_visit = SmallVec::<[(SmallVec<[Node; 24]>, bool); 1024]>::new();
-    all_to_visit.push((SmallVec::<[Node; 24]>::new(), false));
+    let mut all_to_visit = SmallVec::<[(SmallVec<[Node; 20]>, bool); 512]>::new();
+    all_to_visit.push((SmallVec::<[Node; 20]>::new(), false));
     all_to_visit[0].0.push(Node::Start);
 
     let mut path_count = 0usize;
