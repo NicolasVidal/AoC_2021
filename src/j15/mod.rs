@@ -9,8 +9,7 @@ struct Node {
     closed: bool,
 }
 
-fn a_star(s: &str) -> usize {
-
+fn a_star(s: &str, enlarge_grid: bool) -> usize {
     let mut grid = Vec::new();
 
     for line in s.lines() {
@@ -21,14 +20,14 @@ fn a_star(s: &str) -> usize {
         grid.push(row);
     }
 
-    let rows = grid.len();
-    let cols = grid[0].len();
+    let rows = if enlarge_grid { grid.len() * 5 } else { grid.len() };
+    let cols = if enlarge_grid { grid[0].len() * 5 } else { grid[0].len() };
 
     let start_node = Node {
         total_cost: 0,
         row: 0,
         col: 0,
-        closed: false
+        closed: false,
     };
 
     let mut known_nodes = HashMap::with_capacity(rows * cols);
@@ -38,7 +37,11 @@ fn a_star(s: &str) -> usize {
         let min_node = known_nodes
             .iter_mut()
             .filter(|(_, n)| !n.closed)
-            .min_by_key(|(_, n)|n.total_cost).unwrap().1;
+            .min_by_key(|(_, n)| n.total_cost
+                // heuristic seems to harm performances
+                // + (n.row as isize - rows as isize + 1).abs()
+                // + (n.col as isize - cols as isize + 1).abs()
+            ).unwrap().1;
 
         min_node.closed = true;
 
@@ -71,22 +74,32 @@ fn a_star(s: &str) -> usize {
     }
 }
 
-fn update_neighbour(grid: &mut Vec<Vec<u8>>, known_nodes: &mut HashMap<(usize, usize), Node>, min_node: &Node, n_row: usize, n_col: usize) {
+fn update_neighbour(grid: &mut Vec<Vec<u8>>, known_nodes: &mut HashMap<(usize, usize), Node>, min_node: &Node,
+                    n_row: usize, n_col: usize) {
     let neighbour = known_nodes.entry((n_row, n_col))
         .or_insert(Node {
             total_cost: isize::MAX,
             row: n_row,
             col: n_col,
-            closed: false
+            closed: false,
         });
-    if neighbour.total_cost - grid[n_row][n_col] as isize > min_node.total_cost {
-        neighbour.total_cost = min_node.total_cost + grid[n_row][n_col] as isize;
+    let real_rows = grid.len();
+    let real_cols = grid[0].len();
+
+    let sub_grid_row = n_row / real_rows;
+    let sub_grid_col = n_col / real_cols;
+    let original_value = grid[n_row % real_rows][n_col % real_cols] as isize;
+
+    let real_value = ((original_value - 1) + sub_grid_row as isize + sub_grid_col as isize) % 9 + 1;
+
+    if neighbour.total_cost - real_value as isize > min_node.total_cost {
+        neighbour.total_cost = min_node.total_cost + real_value as isize;
     }
 }
 
 
 pub fn _p1(s: &str) -> usize {
-    a_star(s)
+    a_star(s, false)
 }
 
 pub fn p1() -> usize {
@@ -94,7 +107,7 @@ pub fn p1() -> usize {
 }
 
 pub fn _p2(s: &str) -> usize {
-    a_star(s)
+    a_star(s, true)
 }
 
 pub fn p2() -> usize {
@@ -113,7 +126,7 @@ mod j15_tests {
 
     #[test]
     fn test_p2() {
-        assert_eq!(2188189693529, _p2(include_str!("j15_test.txt")));
-        assert_eq!(2884513602164, _p2(include_str!("j15.txt")));
+        assert_eq!(315, _p2(include_str!("j15_test.txt")));
+        assert_eq!(2893, _p2(include_str!("j15.txt")));
     }
 }
