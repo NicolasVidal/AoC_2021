@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 
 #[derive(Clone)]
@@ -6,7 +6,6 @@ struct Node {
     total_cost: isize,
     row: usize,
     col: usize,
-    closed: bool,
 }
 
 fn a_star(s: &str, enlarge_grid: bool) -> usize {
@@ -27,61 +26,73 @@ fn a_star(s: &str, enlarge_grid: bool) -> usize {
         total_cost: 0,
         row: 0,
         col: 0,
-        closed: false,
     };
 
+    let mut closed_nodes = HashSet::with_capacity(rows * cols);
     let mut known_nodes = HashMap::with_capacity(rows * cols);
     known_nodes.insert((start_node.row, start_node.col), start_node);
 
     loop {
         let min_node = known_nodes
             .iter_mut()
-            .filter(|(_, n)| !n.closed)
             .min_by_key(|(_, n)| n.total_cost
-                // heuristic seems to harm performances
-                // + (n.row as isize - rows as isize + 1).abs()
-                // + (n.col as isize - cols as isize + 1).abs()
+                        // heuristic seems to harm performances
+                        // + (n.row as isize - rows as isize + 1).abs()
+                        // + (n.col as isize - cols as isize + 1).abs()
             ).unwrap().1;
 
-        min_node.closed = true;
-
         let min_node = min_node.clone();
+
+        known_nodes.remove(&(min_node.row, min_node.col));
+        closed_nodes.insert((min_node.row, min_node.col));
 
         if min_node.col == cols - 1 && min_node.row == rows - 1 {
             return min_node.total_cost as usize;
         }
 
         if min_node.col > 0 {
-            update_neighbour(&mut grid, &mut known_nodes, &min_node,
+            update_neighbour(&mut grid,
+                             &closed_nodes,
+                             &mut known_nodes, &min_node,
                              min_node.row,
                              min_node.col - 1);
         }
         if min_node.row > 0 {
-            update_neighbour(&mut grid, &mut known_nodes, &min_node,
+            update_neighbour(&mut grid,
+                             &closed_nodes,
+                             &mut known_nodes, &min_node,
                              min_node.row - 1,
                              min_node.col);
         }
         if min_node.col < cols - 1 {
-            update_neighbour(&mut grid, &mut known_nodes, &min_node,
+            update_neighbour(&mut grid,
+                             &closed_nodes,
+                             &mut known_nodes, &min_node,
                              min_node.row,
                              min_node.col + 1);
         }
         if min_node.row < rows - 1 {
-            update_neighbour(&mut grid, &mut known_nodes, &min_node,
+            update_neighbour(&mut grid,
+                             &closed_nodes,
+                             &mut known_nodes, &min_node,
                              min_node.row + 1,
                              min_node.col);
         }
     }
 }
 
-fn update_neighbour(grid: &mut Vec<Vec<u8>>, known_nodes: &mut HashMap<(usize, usize), Node>, min_node: &Node,
+fn update_neighbour(grid: &mut Vec<Vec<u8>>,
+                    closed_nodes: &HashSet<(usize, usize)>,
+                    known_nodes: &mut HashMap<(usize, usize), Node>, min_node: &Node,
                     n_row: usize, n_col: usize) {
+    if closed_nodes.contains(&(n_row, n_col)) {
+        return;
+    }
     let neighbour = known_nodes.entry((n_row, n_col))
         .or_insert(Node {
             total_cost: isize::MAX,
             row: n_row,
             col: n_col,
-            closed: false,
         });
     let real_rows = grid.len();
     let real_cols = grid[0].len();
