@@ -67,13 +67,17 @@ fn main() {
     println!("J13 ----------------------------------------------------");
     println!("p1"); println!("{}", j13::p1());
     println!("p2"); println!("{}", j13::p2());
+    println!();
     println!("J14 ----------------------------------------------------");
     println!("p1"); println!("{}", j14::p1());
     println!("p2"); println!("{}", j14::p2());
+    println!();
     println!("J15 ----------------------------------------------------");
     println!("p1"); println!("{}", j15::p1());
     println!("p2"); println!("{}", j15::p2());
+    println!();
     println!("J16 ----------------------------------------------------");
     println!("p1"); println!("{}", j16::p1());
     println!("p2"); println!("{}", j16::p2());
+    println!();
 }

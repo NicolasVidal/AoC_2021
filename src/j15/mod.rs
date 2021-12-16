@@ -151,19 +151,6 @@ fn update_neighbour(nodes_to_explore: &mut BTreeSet<Rc<AStarNode>>,
         nodes_to_explore.insert(updated_node.clone());
         nodes[n_row][n_col] = updated_node;
     }
-
-    // let real_rows = grid.len();
-    // let real_cols = grid[0].len();
-    //
-    // let sub_grid_row = n_row / real_rows;
-    // let sub_grid_col = n_col / real_cols;
-    // let original_value = grid[n_row % real_rows][n_col % real_cols] as isize;
-    //
-    // let real_value = ((original_value - 1) + sub_grid_row as isize + sub_grid_col as isize) % 9 + 1;
-    //
-    // if neighbour.total_cost - real_value as isize > min_node.total_cost {
-    //     neighbour.total_cost = min_node.total_cost + real_value as isize;
-    // }
 }
 
 
