@@ -7,7 +7,7 @@ use smallvec::SmallVec;
 enum CubeSet {
     Empty,
     Single(Cube),
-    Set(SmallVec<[Cube; 27]>),
+    Set(SmallVec<[Cube; 64]>),
 }
 
 impl CubeSet {
@@ -117,7 +117,7 @@ impl Cube {
             return CubeSet::Set(SmallVec::from_iter([self, other]));
         }
 
-        let mut cubes = SmallVec::<[Cube; 27]>::new();
+        let mut cubes = SmallVec::<[Cube; 64]>::new();
 
         let (x_possibilities, y_possibilities, z_possibilities) =
             self.get_zones_possibilities(&other);
@@ -206,7 +206,7 @@ impl Cube {
             return CubeSet::Single(self);
         }
 
-        let mut cubes = SmallVec::<[Cube; 27]>::new();
+        let mut cubes = SmallVec::<[Cube; 64]>::new();
 
         let (x_possibilities, y_possibilities, z_possibilities) =
             self.get_zones_possibilities(&other);
