@@ -131,6 +131,11 @@ name = "j24"
 path = "src/bench_j24.rs"
 harness = false
 
+[[bench]]
+name = "j25"
+path = "src/bench_j25.rs"
+harness = false
+
 [dependencies]
 itertools="0.10.1"
 criterion = {version="0.3.5", features=["html_reports"]}
